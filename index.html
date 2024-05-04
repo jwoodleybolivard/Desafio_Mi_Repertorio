@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repertorio de Canciones</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div id="AgregarCancion">
+      <h2 class="pt-3">&#119070; Mi Repertorio de Canciones &#119070;</h2>
+
+      <div class="container pt-5 w-50">
+        <div>
+          <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label">Canción:</label>
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="cancion"
+                placeholder="Nombre de la canción"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="email" class="col-sm-2 col-form-label">Artista: </label>
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="artista"
+                placeholder="Nombre del artista"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="rut" class="col-sm-2 col-form-label">Tono:</label>
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="tono"
+                placeholder="Tono de la canción"
+              />
+            </div>
+          </div>
+          <button
+            onclick="nuevaCancion()"
+            id="agregar"
+            class="m-auto btn btn-success"
+          >
+            Agregar
+          </button>
+          <button
+            onclick="editarCancion()"
+            id="editar"
+            class="m-auto btn btn-info"
+            style="display: none"
+          >
+            Editar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="ListaCanciones">
+      <hr />
+      <h2>Tabla de canciones &#127908;</h2>
+
+      <div class="container pt-5 w-75">
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Canción</th>
+              <th scope="col">Artista</th>
+              <th scope="col">Tono</th>
+              <th scope="col">-</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Axios para realizar solicitudes HTTP -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </body>
+</html>
+
+<style>
+  body {
+    text-align: center;
+    background: #283593;
+    color: white;
+  }
+</style>
+
+<script>
+  // Variables para manejar la URL de la API
+  let url = "/cancion";
+  // Elementos del formulario
+  let cancion = document.getElementById("cancion");
+  let artista = document.getElementById("artista");
+  let tono = document.getElementById("tono");
+  // Elemento donde se mostrarán las canciones
+  let tbody = document.getElementById("cuerpo");
+  // Arreglo para almacenar las canciones
+  let canciones = [];
+
+  // Función para obtener y mostrar las canciones
+  async function getData() {
+    try {
+      const response = await axios.get(url + "es");
+      canciones = response.data;
+      // Limpiar tabla antes de agregar datos
+      tbody.innerHTML = "";
+      canciones.forEach((c, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${c.titulo}</td>
+            <td>${c.artista}</td>
+            <td>${c.tono}</td>
+            <td>
+              <button class="btn btn-warning" onclick="prepararCancion(${i},'${
+          c.id
+        }')">Editar</button>
+        <button class="btn btn-danger" onclick="eliminarCancion(${i},'${
+          c.id
+        }')">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+      // Limpiar campos del formulario después de mostrar datos
+      cancion.value = "";
+      artista.value = "";
+      tono.value = "";
+    } catch (error) {
+      console.error("Error al obtener datos:", error);
+    }
+  }
+
+  // Función para agregar una nueva canción
+  function nuevaCancion() {
+    const data = {
+      titulo: cancion.value,
+      artista: artista.value,
+      tono: tono.value,
+    };
+    axios
+      .post(url, data)
+      .then(() => getData())
+      .catch((error) => console.error("Error al agregar canción:", error));
+  }
+
+  // Función para eliminar una canción
+  function eliminarCancion(i, id) {
+    console.log("valor de i:", i, "valor de id:", id);
+    console.log("canciones: ", canciones);
+    axios
+      .delete(url + "?id=" + id)
+      .then(() => {
+        alert("Canción " + canciones[i].titulo + " eliminada");
+        getData();
+      })
+      .catch((error) => console.error("Error al eliminar canción:", error));
+  }
+
+  // Función para preparar la edición de una canción
+  function prepararCancion(i, id) {
+    cancion.value = canciones[i].titulo;
+    artista.value = canciones[i].artista;
+    tono.value = canciones[i].tono;
+    document
+      .getElementById("editar")
+      .setAttribute("onclick", `editarCancion('${id}')`);
+    document.getElementById("agregar").style.display = "none";
+    document.getElementById("editar").style.display = "block";
+  }
+
+  // Función para editar una canción
+  function editarCancion(id) {
+    const data = {
+      titulo: cancion.value,
+      artista: artista.value,
+      tono: tono.value,
+    };
+    axios
+      .put(url + "/" + id, data)
+      .then(() => {
+        getData();
+        document.getElementById("agregar").style.display = "block";
+        document.getElementById("editar").style.display = "none";
+      })
+      .catch((error) => console.error("Error al editar canción:", error));
+  }
+
+  // Cargar datos al cargar la página
+  window.onload = getData;
+</script>
