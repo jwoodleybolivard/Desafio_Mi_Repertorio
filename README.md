@@ -13,6 +13,13 @@ La escuela de música “E-Sueño” está promoviendo presentaciones en vivo de
 - **PUT /cancion**: Recibe los datos de una canción que se desea editar y actualiza el registro correspondiente en la tabla de canciones.
 - **DELETE /cancion**: Recibe el ID de una canción por queryString y elimina el registro correspondiente de la tabla de canciones.
 
+## Referencia
+
+Tienes a disposición un Apoyo Desafío - Mi Repertorio con la aplicación cliente que se muestra en la siguiente imagen, lista para el consumo de estas rutas, por lo que deberás enfocarte solo en el desarrollo backend
+
+![image](https://github.com/jwoodleybolivard/Desafio_Mi_Repertorio/assets/125617339/09610495-2a7b-4d01-ba5b-4834fe224a1a)
+
+
 ## Requerimientos
 
 1. **POST /cancion**: Crea una ruta que reciba los datos de una canción y los inserte en la tabla de canciones de manera asíncrona.
